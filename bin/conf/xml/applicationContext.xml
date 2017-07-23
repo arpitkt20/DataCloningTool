@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  
+    xmlns="http://www.springframework.org/schema/beans"  
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xmlns:tx="http://www.springframework.org/schema/tx" 
+    xmlns:jee="http://www.springframework.org/schema/jee"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans  
+               http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx.xsd 
+http://www.springframework.org/schema/jee
+   http://www.springframework.org/schema/jee/spring-jee.xsd">
+ 
+  	<context:component-scan base-package="com.dataCloningTool.*" /> 
+    <tx:annotation-driven/>        
+
+    <bean id="cloneData" class="com.dataCloningTool.entry.CloneData"/> 
+	<bean id="inputModel" class="com.dataCloningTool.model.InputModel"/>
+	
+    <bean id="batchSqlTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+         <constructor-arg index="0" ref="as400SessionFactory" />
+         <constructor-arg index="1" value="BATCH" />
+    </bean>
+    
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="appDataSource"/>
+	</bean>
+  	
+  	
+	<bean id="as400SessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+      <property name="dataSource" ref="appDataSource" />
+	  <property name="configLocation" value="classpath:conf/xml/mybatis-config.xml" />
+	  <property name="mapperLocations" value="classpath:/conf/xml/mapper/*.xml"/>
+    </bean>   
+  	
+  	
+  	<!-- Data Source Properties Configuration -->
+  		
+  	 <bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	 	<property name="locations">
+		 	<list>
+		  	<value>classpath:conf/DB.properties</value>
+		  	</list>
+	  	</property>
+	 </bean>
+	 	
+	<!-- Data sources Configuration--> 
+	<!-- Using Connection Pooling -->
+  	
+	<bean id="srcDBDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+           <property name="driverClassName"><value>${jdbc.as400.grn.driver}</value></property>
+           <property name="url"><value>${jdbc.as400.grn.url}</value></property>
+           <property name="username"><value>${jdbc.as400.grn.user}</value></property>
+           <property name="password"><value>${jdbc.as400.grn.password}</value></property>
+           <property name="initialSize" value="2"/>
+           <property name="maxActive" value="2"/>
+           <property name="minIdle" value="0"/>
+           <property name="testOnBorrow" value="true"/>
+           <property name="testOnReturn" value="true"/>
+		   <property name="testWhileIdle" value="true"/>
+           <property name="validationQuery" value="select 1 FROM (values 1) T"/>
+           <property name="accessToUnderlyingConnectionAllowed" value="true"/>   
+	</bean>
+	
+		<bean id="destDBDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+           <property name="driverClassName"><value>${jdbc.as400.grn.driver}</value></property>
+           <property name="url"><value>${jdbc.as400.grn.url}</value></property>
+           <property name="username"><value>${jdbc.as400.grn.user}</value></property>
+           <property name="password"><value>${jdbc.as400.grn.password}</value></property>
+           <property name="initialSize" value="2"/>
+           <property name="maxActive" value="2"/>
+           <property name="minIdle" value="0"/>
+           <property name="testOnBorrow" value="true"/>
+           <property name="testOnReturn" value="true"/>
+		   <property name="testWhileIdle" value="true"/>
+           <property name="validationQuery" value="select 1 FROM (values 1) T"/>
+           <property name="accessToUnderlyingConnectionAllowed" value="true"/>   
+	</bean>
+	    
+</beans> 
